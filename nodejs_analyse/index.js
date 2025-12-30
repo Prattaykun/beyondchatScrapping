@@ -7,7 +7,7 @@ import articleRoutes from "./routes/articles.routes.js";
 import formattedRoutes from "./routes/formattedArticles.routes.js";
 
 dotenv.config();
-
+const app = express();
 const allowedOrigins = [
   "https://beyondchat-scrapping.vercel.app/",
   "http://localhost:5173"
