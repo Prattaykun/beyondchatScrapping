@@ -34,7 +34,7 @@ Check out the live demo of the project here: [BeyondChat Scrapping](https://beyo
 
 ```
                   ┌─────────────────────┐
-                  │  BeyondChats Website │
+                  │  BeyondChats Website│
                   └─────────┬───────────┘
                             │
                      (Web Scraping)
