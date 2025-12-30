@@ -39,12 +39,12 @@ This project is the frontend application for the BeyondChats Blogs platform. Bui
 
 ## ⚙️ Configuration
 
-The application expects the backend API (`nodejs_analyse`) to be running. By default, it may look for the API at `http://localhost:3000`.
+The application expects the backend API (`nodejs_analyse`) to be running. By default, it may look for the API at `http://localhost:8001`.
 
 If environment configuration is needed (e.g., API URL), create a `.env.local` file in the root directory:
 
 ```env
-REACT_APP_API_BASE_URL=http://localhost:3000
+VITE_API_BASE_URL=http://localhost:8001/api
 ```
 *(Note: Verify the actual variable name used in the code, commonly `VITE_` prefix is required for Vite).*
 
