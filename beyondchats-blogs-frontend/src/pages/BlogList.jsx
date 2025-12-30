@@ -4,17 +4,31 @@ import { Link } from "react-router-dom";
 
 export default function BlogList() {
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchArticles().then(setBlogs);
+    fetchArticles().then((data) => {
+      setBlogs(data);
+      setLoading(false);
+    });
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-pulse text-4xl font-bold text-gray-500">
+          Loading...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-3xl font-bold mb-10">Latest Blogs</h1>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        {blogs.map(blog => (
+        {blogs.map((blog) => (
           <Link
             key={blog._id}
             to={`/blogs/${blog._id}`}
