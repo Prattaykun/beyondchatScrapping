@@ -150,10 +150,10 @@ npm install
 ### 2️⃣ Setup Environment Variables (`.env`)
 
 ```env
-PORT=8001
-MONGODB_URI=mongodb://127.0.0.1:27017/beyondchats
-GEMINI_API_KEY=your_gemini_api_key
+MONGODB_URI=mongodb+srv://tomdevis38_db_user:tomdevis38_db_user@beyondchatscrap.fzzkugy.mongodb.net/?appName=BeyondChatScrap #(please do not delete the existing data)
+GEMINI_API_KEY=your_gemini_key
 SERP_API_KEY=your_serpapi_key
+PORT=3000
 ```
 
 ---
