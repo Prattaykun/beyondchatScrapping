@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+  img {
+    @apply max-w-full h-auto;
+  }
+}
+
+/* Custom overrides if needed, but trying to stick to utilities */
+.prose {
+  @apply max-w-none;
+}
+
+.prose img {
+  @apply rounded-xl shadow-sm;
+}
