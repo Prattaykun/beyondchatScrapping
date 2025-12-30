@@ -150,7 +150,7 @@ Transforms raw scraped content into **human-like, SEO-optimized articles**.
 ### 🔹 Environment Variables
 
 ```env
-MONGODB_URI=mongodb+srv://tomdevis38_db_user:tomdevis38_db_user@beyondchatscrap.fzzkugy.mongodb.net/?appName=BeyondChatScrap (please do not delete the existing data)
+MONGODB_URI=mongodb+srv://tomdevis38_db_user:tomdevis38_db_user@beyondchatscrap.fzzkugy.mongodb.net/?appName=BeyondChatScrap #(please do not delete the existing data)
 GEMINI_API_KEY=your_gemini_key
 SERP_API_KEY=your_serpapi_key
 PORT=3000
