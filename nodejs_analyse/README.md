@@ -1,257 +1,98 @@
+# Node.js Article Enhancer & Analysis API (Phase 2)
 
----
+This project is the "Phase 2" backend for the BeyondChats blog system. It is responsible for analyzing, enhancing, and serving the blog articles that were scraped in Phase 1. It provides an API for the frontend to retrieve formatted articles and includes scripts for further data processing.
 
-# BeyondChats – Full Stack Web Developer Intern Assignment
+## 📋 Table of Contents
 
-## 📌 Overview
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Architecture](#architecture)
+- [Workflow](#workflow)
+- [Scripts](#scripts)
 
-This project is developed as part of the **BeyondChats Full Stack Web Developer Intern Assignment**.
-The goal is to scrape blog articles, enhance them using AI by referencing top-ranking Google articles, and expose APIs for frontend consumption.
+## ✨ Features
 
-The assignment is divided into **three phases**. This repository covers **Phase 1 and Phase 2** completely.
+- **REST API**: Serves article data via Express endpoints.
+- **Article Processing**: Scripts to analyze and format raw scraped data.
+- **CORS Enabled**: Configured to allow requests from the frontend application (`http://localhost:5173`).
+- **Database Integration**: Connects to the same MongoDB database as the scraper to access and update article data.
 
----
+## 🛠 Prerequisites
 
-## 🧩 Project Architecture (High Level)
+- [Node.js](https://nodejs.org/) (v14 or higher)
+- [npm](https://www.npmjs.com/)
+- [MongoDB](https://www.mongodb.com/) (containing data from Phase 1)
 
-```
-MongoDB
- ├── articles (original scraped articles)
- └── formatted_articles (AI-enhanced versions)
+## 🚀 Installation
 
-Backend (Node.js + Express)
- ├── CRUD APIs for articles
- ├── CRUD APIs for formatted articles
- └── Phase-2 background workflow (AI enhancement)
+1.  **Navigate to the directory**:
+    ```bash
+    cd nodejs_analyse
+    ```
 
-Frontend (Phase 3 – upcoming)
- └── Uses CRUD APIs to display and compare articles
-```
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
----
+## ⚙️ Configuration
 
-## 🛠 Tech Stack
-
-* **Backend:** Node.js, Express
-* **Database:** MongoDB
-* **Web Scraping:** Axios, Cheerio
-* **Google Search:** SerpAPI
-* **AI Model:** Google Gemini (gemini-1.5-pro)
-* **Environment Management:** dotenv
-
----
-
-## 📁 Folder Structure
-
-```
-phase-2/
-├── index.js                      # API Server
-├── scripts/
-│   └── runPhase2Workflow.js      # Phase-2 automation job
-├── models/
-│   ├── Article.js
-│   └── FormattedArticle.js
-├── routes/
-│   ├── articles.routes.js
-│   └── formattedArticles.routes.js
-├── services/
-│   ├── fetchArticles.js
-│   ├── googleSearch.js
-│   ├── scrapeContent.js
-│   ├── geminiRewrite.js
-│   └── saveFormattedArticle.js
-├── utils/
-│   ├── cleanHtml.js
-│   └── logger.js
-├── .env
-├── package.json
-└── README.md
-```
-
----
-
-## 🧠 Phase Breakdown
-
----
-
-## ✅ Phase 1 – Article Scraping & CRUD APIs
-
-### Features
-
-* Scraped blog articles from BeyondChats
-* Stored articles in MongoDB
-* Implemented full CRUD APIs
-
-### APIs
-
-```
-POST   /api/articles
-GET    /api/articles
-GET    /api/articles/:id
-PUT    /api/articles/:id
-DELETE /api/articles/:id
-```
-
----
-
-## 🚀 Phase 2 – AI-Powered Article Enhancement (Core Focus)
-
-### What This Phase Does
-
-For each original article:
-
-1. Searches the article title on Google
-2. Fetches the top 2 ranking blog/article links
-3. Scrapes the main readable content
-4. Uses **Gemini LLM** to rewrite the original article
-5. Matches tone, structure, and clarity of top-ranking articles
-6. Appends reference links at the bottom
-7. Stores the enhanced article in a separate collection
-
----
-
-## 🧪 Why Two Collections?
-
-| Collection           | Purpose                   |
-| -------------------- | ------------------------- |
-| `articles`           | Original scraped articles |
-| `formatted_articles` | AI-enhanced versions      |
-
-This allows:
-
-* Side-by-side comparison in frontend
-* Version control
-* Clean separation of original vs AI content
-
----
-
-## 🔁 Phase 2 Workflow Execution
-
-### Important Design Decision
-
-The AI workflow is **not executed automatically** when the server starts.
-
-✔ Implemented as a **separate background script**
-✔ Prevents duplicate processing
-✔ Mimics real-world production pipelines
-
----
-
-## ▶ Running the Project
-
-### 1️⃣ Install Dependencies
-
-```bash
-npm install
-```
-
----
-
-### 2️⃣ Setup Environment Variables (`.env`)
+Create a `.env` file in the root of the `nodejs_analyse` directory with the following variables:
 
 ```env
-PORT=8001
-MONGODB_URI=mongodb://127.0.0.1:27017/beyondchats
-GEMINI_API_KEY=your_gemini_api_key
-SERP_API_KEY=your_serpapi_key
+MONGODB_URI=mongodb://localhost:27017/beyondchats
+PORT=3000
 ```
 
----
+- `MONGODB_URI`: Your MongoDB connection string. **Note**: This variable name is slightly different from the scraper (`MONGO_URI`). Ensure it points to the same database.
+- `PORT`: The port on which the API server will run (default is 3000).
 
-### 3️⃣ Start Backend API Server
+## 🏗 Architecture
 
-```bash
-npm start
-```
-
-Server runs at:
+The project follows a standard Express MVC-like structure:
 
 ```
-http://localhost:8001
+nodejs_analyse/
+├── routes/
+│   ├── articles.routes.js          # Routes for raw article data
+│   └── formattedArticles.routes.js # Routes for processed/formatted articles
+├── scripts/
+│   └── runPhase2Workflow.js        # Script to execute the Phase 2 analysis workflow
+├── models/                         # Mongoose models (shared/compatible with Phase 1)
+├── services/                       # Business logic for article processing
+├── utils/                          # Helper functions
+├── index.js                        # Main application entry point
+└── package.json                    # Project dependencies and scripts
 ```
 
----
+### Key Components
 
-### 4️⃣ Run Phase-2 AI Enhancement Workflow
+- **`index.js`**: Sets up the Express server, middleware (CORS, JSON parsing), and connects to MongoDB. It defines the base routes for the API.
+- **`routes/`**: Defines the endpoints for accessing articles.
+    - `/api/articles`: Access raw scraped articles.
+    - `/api/formatted-articles`: Access processed articles ready for display.
+- **`scripts/runPhase2Workflow.js`**: A script intended to be run to perform batch processing or enhancement on the scraped data (Phase 2 tasks).
 
-```bash
-npm run run:phase2
-```
+## 🔄 Workflow
 
-This:
+1.  **Start the Server**:
+    To serve the API for the frontend, start the application:
+    ```bash
+    npm start
+    ```
+    The server will typically run on `http://localhost:3000`.
 
-* Fetches original articles
-* Enhances them using Gemini
-* Stores results in `formatted_articles`
+2.  **Run Analysis Phase**:
+    To execute the specific analysis or enhancement workflow (Phase 2):
+    ```bash
+    npm run run:phase2
+    ```
+    This runs the `scripts/runPhase2Workflow.js` script, which processes the data in the database.
 
----
+## 📜 Scripts
 
-## 🔍 Testing APIs
-
-### Get Original Articles
-
-```
-GET /api/articles
-```
-
-### Get All AI-Enhanced Articles
-
-```
-GET /api/formatted-articles
-```
-
-### Get Enhanced Version of an Article
-
-```
-GET /api/formatted-articles/by-original/:articleId
-```
-
-These endpoints will be consumed by the frontend in Phase 3.
-
----
-
-## ⚠️ Scraping Limitations (Handled Gracefully)
-
-Some websites block automated scraping (403 errors via CloudFront).
-
-✔ Handled by:
-
-* Browser-like headers
-* Graceful fallback
-* Skipping blocked domains without crashing the pipeline
-
-This reflects **real-world scraping constraints**.
-
----
-
-## 🧩 Phase 3 (Planned)
-
-* React-based frontend
-* Responsive UI
-* Side-by-side comparison:
-
-  * Original article
-  * AI-enhanced article
-* Reference links visible
-* Clean, professional layout
-
----
-
-## 🏁 Conclusion
-
-This project demonstrates:
-
-* Clean backend architecture
-* Separation of concerns
-* Practical web scraping
-* AI integration
-* Scalable, production-style workflow design
-
----
-
-## 👤 Author
-
-**Prattay Roy Chowdhury**
-Full Stack Web Developer Intern Candidate
-
----
+- `npm start`: Runs `node index.js`. Starts the API server.
+- `npm run run:workflow`: Alias for `npm start`.
+- `npm run run:phase2`: Runs `node scripts/runPhase2Workflow.js`. Executes the background processing task.
