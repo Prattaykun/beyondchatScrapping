@@ -1,4 +1,3 @@
-
 ---
 
 # 🚀 BeyondChats – End-to-End AI Blog Processing System
@@ -27,6 +26,10 @@ Displays original and AI-enhanced articles through a modern React + Vite interfa
 
 ---
 
+## Live Demo
+
+Check out the live demo of the project here: [BeyondChat Scrapping](https://beyondchat-scrapping.vercel.app/)
+---
 ## 🧠 Overall Architecture
 
 ```
@@ -227,4 +230,5 @@ VITE_API_BASE_URL=http://localhost:8001/api
 ## 👨‍💻 Author
 
 **Prattay Roy Chowdhury**
+
 ---
