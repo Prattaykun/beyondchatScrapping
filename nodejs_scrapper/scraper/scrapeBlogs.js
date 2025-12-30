@@ -22,12 +22,12 @@ async function scrapeBlogs() {
       href = BASE_URL + href;
     }
 
-    if (href.startsWith("https://beyondchats.com/blogs/")) {
+    if (href.startsWith(`${BASE_URL}/blogs/`)) {
       links.add(href);
     }
   });
 
-  console.log("Found links:", links.size);
+  console.log("🔗 Found links:", links.size);
 
   for (const link of [...links].slice(0, 5)) {
     try {
@@ -40,28 +40,73 @@ async function scrapeBlogs() {
       const sections = [];
       const images = [];
 
-      // Collect images from figure tags
+      // ✅ Collect images
       $$("figure img").each((_, img) => {
         const src = $$(img).attr("src");
         if (src) images.push(src);
       });
 
-      // Parse h3 + consecutive p tags
+      // ✅ Parse sections under each h3
       $$("#content h3").each((_, h3) => {
         const heading = $$(h3).text().trim();
-        const paragraphs = [];
+        const blocks = [];
 
         let next = $$(h3).next();
-        while (next.length && next[0].tagName === "p") {
-          const text = next.text().trim();
-          if (text) paragraphs.push(text);
+
+        while (next.length) {
+          const tag = next[0].tagName;
+
+          // Stop at next section
+          if (tag === "h3") break;
+
+          // Paragraph block
+          if (tag === "p") {
+            const text = next.text().trim();
+            if (text) {
+              blocks.push({
+                type: "paragraph",
+                text
+              });
+            }
+          }
+
+          // Ordered / Unordered list block
+          if (tag === "ol" || tag === "ul") {
+            const ordered = tag === "ol";
+            const items = [];
+
+            next.find("li").each((_, li) => {
+              const strong = $$(li).find("strong").first();
+              let title = "";
+              let description = "";
+
+              if (strong.length) {
+                title = strong.text().replace(":", "").trim();
+                strong.remove();
+                description = $$(li).text().trim();
+              } else {
+                description = $$(li).text().trim();
+              }
+
+              items.push({ title, description });
+            });
+
+            if (items.length) {
+              blocks.push({
+                type: "list",
+                ordered,
+                items
+              });
+            }
+          }
+
           next = next.next();
         }
 
-        if (heading && paragraphs.length) {
+        if (heading && blocks.length) {
           sections.push({
             heading,
-            paragraphs
+            blocks
           });
         }
       });
@@ -74,13 +119,13 @@ async function scrapeBlogs() {
         images
       });
 
-      console.log("Saved blog:", title);
+      console.log(" Saved structured blog:", title);
     } catch (err) {
       console.error(" Failed to scrape:", link);
     }
   }
 
-  console.log(" scraping completed successfully!");
+  console.log(" Structured scraping completed successfully!");
   process.exit();
 }
 

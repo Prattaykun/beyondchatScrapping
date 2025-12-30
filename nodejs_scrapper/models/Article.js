@@ -1,5 +1,3 @@
-const mongoose = require("mongoose");
-
 const articleSchema = new mongoose.Schema({
   title: String,
   sourceUrl: String,
@@ -7,10 +5,23 @@ const articleSchema = new mongoose.Schema({
   sections: [
     {
       heading: String,
-      paragraphs: [String]
+      blocks: [
+        {
+          type: {
+            type: String, // paragraph | list
+            required: true
+          },
+          text: String,
+          ordered: Boolean,
+          items: [
+            {
+              title: String,
+              description: String
+            }
+          ]
+        }
+      ]
     }
   ],
   images: [String]
 });
-
-module.exports = mongoose.model("Article", articleSchema);
