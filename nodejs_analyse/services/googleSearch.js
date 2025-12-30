@@ -20,8 +20,8 @@ export const googleSearch = async (title) => {
     !r.link.includes("reddit.com")
   );
 
-  // Take top 2
-  return filtered.slice(0, 2).map(r => ({
+  // Take top 5
+  return filtered.slice(0, 5).map(r => ({
     title: r.title,
     url: r.link
   }));

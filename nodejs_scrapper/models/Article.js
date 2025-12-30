@@ -2,9 +2,15 @@ const mongoose = require("mongoose");
 
 const articleSchema = new mongoose.Schema({
   title: String,
-  content: String,
   sourceUrl: String,
-  publishedAt: Date
-}, { timestamps: true });
+  publishedAt: Date,
+  sections: [
+    {
+      heading: String,
+      paragraphs: [String]
+    }
+  ],
+  images: [String]
+});
 
 module.exports = mongoose.model("Article", articleSchema);

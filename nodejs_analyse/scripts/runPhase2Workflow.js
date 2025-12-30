@@ -16,19 +16,19 @@ dotenv.config();
 const isValidContent = (text) => {
   return (
     typeof text === "string" &&
-    text.trim().length > 300 // minimal useful length
+    text.trim().length > 300
   );
 };
 
 (async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log("✅ MongoDB connected");
+    console.log(" MongoDB connected");
 
     const articles = await fetchArticles();
 
     for (const article of articles) {
-      console.log(`\n➡ Processing: ${article.title}`);
+      console.log(`\n -> Processing: ${article.title}`);
 
       /* -------------------------------
          1. Skip if already processed
@@ -38,7 +38,7 @@ const isValidContent = (text) => {
       });
 
       if (alreadyExists) {
-        console.log("⚠️ Already formatted — skipping");
+        console.log(" Already formatted — skipping");
         continue;
       }
 
@@ -49,38 +49,52 @@ const isValidContent = (text) => {
       try {
         searchResults = await googleSearch(article.title);
       } catch (err) {
-        console.log("❌ Google search failed — skipping");
+        console.log(" Google search failed — skipping");
         continue;
       }
 
       if (!searchResults || searchResults.length < 2) {
-        console.log("⚠️ Not enough search results — skipping");
+        console.log(" Not enough search results — skipping");
         continue;
       }
 
       /* -------------------------------
          3. Scrape Reference Articles
+         (Try top → lower ranked results)
       -------------------------------- */
-      let ref1Content = "";
-      let ref2Content = "";
+      let referenceContents = [];
+      let referenceMeta = [];
 
-      try {
-        ref1Content = await scrapeContent(searchResults[0].url);
-      } catch (_) {}
+      for (const result of searchResults) {
+        if (referenceContents.length === 2) break;
 
-      try {
-        ref2Content = await scrapeContent(searchResults[1].url);
-      } catch (_) {}
+        try {
+          const content = await scrapeContent(result.url);
 
-      if (
-        !isValidContent(ref1Content) ||
-        !isValidContent(ref2Content)
-      ) {
+          if (isValidContent(content)) {
+            referenceContents.push(content);
+            referenceMeta.push({
+              title: result.title,
+              url: result.url,
+            });
+            console.log(` Scraped: ${result.url}`);
+          } else {
+            console.log(` Weak content, skipped: ${result.url}`);
+          }
+        } catch (err) {
+          console.log(` Blocked, skipped: ${result.url}`);
+        }
+      }
+
+      if (referenceContents.length < 2) {
         console.log(
-          "⚠️ Reference content blocked / insufficient — skipping"
+          "⚠️ Could not scrape 2 valid reference articles — skipping"
         );
         continue;
       }
+
+      const ref1Content = referenceContents[0];
+      const ref2Content = referenceContents[1];
 
       /* -------------------------------
          4. Gemini Rewrite
@@ -93,12 +107,12 @@ const isValidContent = (text) => {
           ref2Content
         );
       } catch (err) {
-        console.log("❌ Gemini failed — skipping");
+        console.log(" Gemini failed — skipping");
         continue;
       }
 
       if (!updatedContent || updatedContent.length < 300) {
-        console.log("⚠️ Gemini returned weak output — skipping");
+        console.log(" Gemini returned weak output — skipping");
         continue;
       }
 
@@ -108,8 +122,8 @@ const isValidContent = (text) => {
       updatedContent += `
 
 ## References
-1. ${searchResults[0].title} – ${searchResults[0].url}
-2. ${searchResults[1].title} – ${searchResults[1].url}
+1. ${referenceMeta[0].title} – ${referenceMeta[0].url}
+2. ${referenceMeta[1].title} – ${referenceMeta[1].url}
 `;
 
       /* -------------------------------
@@ -118,16 +132,16 @@ const isValidContent = (text) => {
       await saveFormattedArticle({
         article,
         updatedContent,
-        references: searchResults,
+        references: referenceMeta,
       });
 
-      console.log("✅ Saved formatted article");
+      console.log(" Saved formatted article");
     }
 
-    console.log("\n🎉 Phase-2 workflow completed");
+    console.log("\n Phase-2 workflow completed");
     process.exit(0);
   } catch (err) {
-    console.error("🔥 Fatal error in Phase-2 workflow:", err);
+    console.error("Fatal error in Phase-2 workflow:", err);
     process.exit(1);
   }
 })();

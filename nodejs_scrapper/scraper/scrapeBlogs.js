@@ -6,22 +6,18 @@ const Article = require("../models/Article");
 
 async function scrapeBlogs() {
   await connectDB();
-  console.log("✅ MongoDB Connected");
+  console.log(" MongoDB Connected");
 
   const BASE_URL = "https://beyondchats.com";
   const response = await axios.get(`${BASE_URL}/blogs/`);
   const $ = cheerio.load(response.data);
 
-  console.log("Page loaded successfully");
-
   const links = new Set();
 
   $("a").each((_, el) => {
     let href = $(el).attr("href");
-
     if (!href) return;
 
-    // Fix relative vs absolute URLs
     if (href.startsWith("/")) {
       href = BASE_URL + href;
     }
@@ -39,24 +35,52 @@ async function scrapeBlogs() {
       const $$ = cheerio.load(page.data);
 
       const title = $$("h1").first().text().trim();
-      const content = $$("article").text().trim();
-
       if (!title) continue;
+
+      const sections = [];
+      const images = [];
+
+      // Collect images from figure tags
+      $$("figure img").each((_, img) => {
+        const src = $$(img).attr("src");
+        if (src) images.push(src);
+      });
+
+      // Parse h3 + consecutive p tags
+      $$("#content h3").each((_, h3) => {
+        const heading = $$(h3).text().trim();
+        const paragraphs = [];
+
+        let next = $$(h3).next();
+        while (next.length && next[0].tagName === "p") {
+          const text = next.text().trim();
+          if (text) paragraphs.push(text);
+          next = next.next();
+        }
+
+        if (heading && paragraphs.length) {
+          sections.push({
+            heading,
+            paragraphs
+          });
+        }
+      });
 
       await Article.create({
         title,
-        content,
         sourceUrl: link,
-        publishedAt: new Date()
+        publishedAt: new Date(),
+        sections,
+        images
       });
 
-      console.log("✅ Saved:", title);
+      console.log("Saved blog:", title);
     } catch (err) {
-      console.error("❌ Failed to scrape:", link);
+      console.error(" Failed to scrape:", link);
     }
   }
 
-  console.log("🎉 Scraping completed successfully!");
+  console.log(" scraping completed successfully!");
   process.exit();
 }
 
