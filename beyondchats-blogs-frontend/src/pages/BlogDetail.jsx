@@ -31,12 +31,39 @@ export default function BlogDetail() {
 
   <div className="mt-8">
     {activeTab === "formatted" ? (
-      <ArticleRenderer sections={formattedWithImages} />
+      <>
+        <ArticleRenderer sections={formattedWithImages} />
+
+        {/* ---------- REFERENCES ---------- */}
+        {data.references?.length > 0 && (
+          <div className="mt-14 pt-8 border-t">
+            <h3 className="text-lg font-semibold mb-4">
+              References
+            </h3>
+
+            <ul className="space-y-2 text-sm">
+              {data.references.map((ref, idx) => (
+                <li key={idx}>
+                  <a
+                    href={ref.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline break-words"
+                  >
+                    {ref.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </>
     ) : (
       <ArticleRenderer sections={data.originalSections} />
     )}
   </div>
 </div>
+
 
   );
 }
