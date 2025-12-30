@@ -4,128 +4,147 @@ const cheerio = require("cheerio");
 const connectDB = require("../config/db");
 const Article = require("../models/Article");
 
+const BASE_URL = "https://beyondchats.com";
+
 async function scrapeBlogs() {
   await connectDB();
-  console.log(" MongoDB Connected");
+  console.log("✅ MongoDB Connected");
 
-  const BASE_URL = "https://beyondchats.com";
-  const response = await axios.get(`${BASE_URL}/blogs/`);
-  const $ = cheerio.load(response.data);
+  // 1️⃣ Load blogs list
+  const listRes = await axios.get(`${BASE_URL}/blogs/`);
+  const $ = cheerio.load(listRes.data);
 
-  const links = new Set();
+  const blogLinks = new Set();
 
-  $("a").each((_, el) => {
-    let href = $(el).attr("href");
+  $("a[href]").each((_, a) => {
+    let href = $(a).attr("href");
     if (!href) return;
-
-    if (href.startsWith("/")) {
-      href = BASE_URL + href;
-    }
-
+    if (href.startsWith("/")) href = BASE_URL + href;
     if (href.startsWith(`${BASE_URL}/blogs/`)) {
-      links.add(href);
+      blogLinks.add(href);
     }
   });
 
-  console.log("🔗 Found links:", links.size);
+  console.log("🔗 Blog URLs found:", blogLinks.size);
 
-  for (const link of [...links].slice(0, 5)) {
+  // 2️⃣ Visit blogs
+  for (const link of [...blogLinks].slice(0, 5)) {
     try {
-      const page = await axios.get(link);
-      const $$ = cheerio.load(page.data);
+      // Dedup
+      const exists = await Article.findOne({ sourceUrl: link });
+      if (exists) continue;
+
+      const pageRes = await axios.get(link);
+      const $$ = cheerio.load(pageRes.data);
 
       const title = $$("h1").first().text().trim();
       if (!title) continue;
 
-      const sections = [];
+      // 3️⃣ CONTENT DIV — THIS IS KEY
+      const contentDiv =
+        $$(".entry-content").first().length
+          ? $$(".entry-content").first()
+          : $$("article").first();
+
+      if (!contentDiv.length) {
+        console.warn("⚠️ No content div:", link);
+        continue;
+      }
+
       const images = [];
+      const contentBlocks = [];
 
-      // ✅ Collect images
-      $$("figure img").each((_, img) => {
+      // Images (figure only, as requested)
+      contentDiv.find("figure img").each((_, img) => {
         const src = $$(img).attr("src");
-        if (src) images.push(src);
+        if (src && !images.includes(src)) images.push(src);
       });
 
-      // ✅ Parse sections under each h3
-      $$("#content h3").each((_, h3) => {
-        const heading = $$(h3).text().trim();
-        const blocks = [];
+      // 4️⃣ Walk content DIV sequentially
+      contentDiv.children().each((_, el) => {
+        const tag = el.tagName?.toLowerCase();
+        const node = $$(el);
 
-        let next = $$(h3).next();
-
-        while (next.length) {
-          const tag = next[0].tagName;
-
-          // Stop at next section
-          if (tag === "h3") break;
-
-          // Paragraph block
-          if (tag === "p") {
-            const text = next.text().trim();
-            if (text) {
-              blocks.push({
-                type: "paragraph",
-                text
-              });
-            }
-          }
-
-          // Ordered / Unordered list block
-          if (tag === "ol" || tag === "ul") {
-            const ordered = tag === "ol";
-            const items = [];
-
-            next.find("li").each((_, li) => {
-              const strong = $$(li).find("strong").first();
-              let title = "";
-              let description = "";
-
-              if (strong.length) {
-                title = strong.text().replace(":", "").trim();
-                strong.remove();
-                description = $$(li).text().trim();
-              } else {
-                description = $$(li).text().trim();
-              }
-
-              items.push({ title, description });
+        // Headings h2–h6
+        if (["h2", "h3", "h4", "h5", "h6"].includes(tag)) {
+          const text = node.text().trim();
+          if (text) {
+            contentBlocks.push({
+              type: "heading",
+              level: Number(tag[1]),
+              text
             });
-
-            if (items.length) {
-              blocks.push({
-                type: "list",
-                ordered,
-                items
-              });
-            }
           }
-
-          next = next.next();
         }
 
-        if (heading && blocks.length) {
-          sections.push({
-            heading,
-            blocks
+        // Paragraph
+        if (tag === "p") {
+          const text = node.text().trim();
+          if (text) {
+            contentBlocks.push({
+              type: "paragraph",
+              text
+            });
+          }
+        }
+
+        // Ordered / Unordered lists
+        if (tag === "ol" || tag === "ul") {
+          const ordered = tag === "ol";
+          const items = [];
+
+          node.find("li").each((_, li) => {
+            const liNode = $$(li);
+            const strong = liNode.find("strong").first();
+
+            let title = "";
+            let description = "";
+
+            if (strong.length) {
+              title = strong.text().replace(":", "").trim();
+              description = liNode
+                .clone()
+                .children("strong")
+                .remove()
+                .end()
+                .text()
+                .trim();
+            } else {
+              description = liNode.text().trim();
+            }
+
+            if (title || description) {
+              items.push({ title, description });
+            }
           });
+
+          if (items.length) {
+            contentBlocks.push({
+              type: "list",
+              ordered,
+              items
+            });
+          }
         }
       });
+      console.log("Blocks found:", contentBlocks.length);
+      console.log("Images found:", images.length);
 
       await Article.create({
         title,
         sourceUrl: link,
         publishedAt: new Date(),
-        sections,
-        images
+        images,
+        contentBlocks
       });
 
-      console.log(" Saved structured blog:", title);
+      console.log("✅ Saved:", title);
     } catch (err) {
-      console.error(" Failed to scrape:", link);
+      console.error("❌ Failed:", link, err.message);
     }
   }
 
-  console.log(" Structured scraping completed successfully!");
+  console.log(" Scraping completed successfully");
   process.exit();
 }
 

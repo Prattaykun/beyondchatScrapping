@@ -1,27 +1,42 @@
-const articleSchema = new mongoose.Schema({
-  title: String,
-  sourceUrl: String,
-  publishedAt: Date,
-  sections: [
-    {
-      heading: String,
-      blocks: [
-        {
-          type: {
-            type: String, // paragraph | list
-            required: true
-          },
-          text: String,
-          ordered: Boolean,
-          items: [
-            {
-              title: String,
-              description: String
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  images: [String]
-});
+const mongoose = require("mongoose");
+
+const SectionSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: ["heading", "paragraph", "image", "list"],
+      required: true
+    },
+
+    // For headings
+    level: String,
+
+    // For paragraph & heading text (HTML preserved)
+    text: String,
+
+    // For images
+    src: String,
+
+    // For lists
+    ordered: Boolean,
+    items: [String]
+  },
+  { _id: false }
+);
+
+const ArticleSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    slug: { type: String, unique: true },
+
+    sections: {
+      type: [SectionSchema],
+      required: true
+    },
+
+    sourceUrl: String
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Article", ArticleSchema);
