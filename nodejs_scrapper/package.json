@@ -1,0 +1,22 @@
+{
+  "name": "beyondchats-phase1",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "scrape": "node scraper/scrapeBlogs.js",
+    "build": "echo \"No build step required for backend\""
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.21.0",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

@@ -1,0 +1,7 @@
+# Ignore node_modules directories
+nodejs_scrapper/node_modules
+nodejs_analyse/node_modules
+
+# Ignore environment files
+nodejs_scrapper/.env
+nodejs_analyse/.env
