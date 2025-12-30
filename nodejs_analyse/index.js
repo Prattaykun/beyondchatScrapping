@@ -9,7 +9,7 @@ import formattedRoutes from "./routes/formattedArticles.routes.js";
 dotenv.config();
 
 const allowedOrigins = [
-  "https://beyondchatscrapping.vercel.app",
+  "https://beyondchat-scrapping.vercel.app/",
   "http://localhost:5173"
 ];
 
