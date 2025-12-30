@@ -97,7 +97,7 @@ async function parseBlogs() {
       sourceUrl: ""
     });
 
-    console.log(`📦 Stored structured article: ${title}`);
+    console.log(` Stored structured article: ${title}`);
   }
 }
 
