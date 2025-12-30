@@ -8,14 +8,26 @@ import formattedRoutes from "./routes/formattedArticles.routes.js";
 
 dotenv.config();
 
-const app = express();
+const allowedOrigins = [
+  "https://beyondchatscrapping.vercel.app",
+  "http://localhost:5173"
+];
 
-/*  ENABLE CORS */
-app.use(cors({
-  origin: ["http://localhost:5173", "https://beyondchat-scrapping.vercel.app/"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: false
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
