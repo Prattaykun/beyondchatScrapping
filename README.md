@@ -227,7 +227,5 @@ VITE_API_BASE_URL=http://localhost:3000
 ## 👨‍💻 Author
 
 **Prattay Roy Chowdhury**
-Full Stack Developer | AI Engineer
-Built as part of an advanced full-stack & AI engineering project.
-
+Full Stack Developer
 ---
