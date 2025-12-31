@@ -99,12 +99,12 @@ nodejs_scrapper/
   - `npm run scrape`: Runs `node scripts/runScraper.js`. Executes the standalone scraping script.
 ## 🔗 Live Demo & API Endpoints
 
-### Base URL
+### Base URL (kindly refresh as vercel deployments make servers sleep on inactivity)
 https://beyondchat-scrapping-3vja.vercel.app
 
 ### Fetch All Articles
 GET /api/articles  
-https://beyondchat-scrapping-3vja.vercel.app/api/articles
+https://beyondchat-scrapping-3vja.vercel.app/api/articles 
 
 ### Fetch Single Article
 GET /api/articles/:id  
