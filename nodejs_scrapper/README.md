@@ -62,12 +62,14 @@ nodejs_scrapper/
 │   └── db.js            # MongoDB connection logic
 ├── models/
 │   └── Article.js       # Mongoose schema for Blog Articles
+├── scripts/
+│   └── runScraper.js    # Standalone script to run the full scraping process
 ├── scraper/
 │   ├── fetchBlogs.js    # Logic to fetch blog URLs
 │   ├── fetchLastPages.js # Logic to determine pagination
 │   ├── fetchMainPage.js # Initial page fetch
 │   ├── parseBlogs.js    # Logic to parse HTML content
-│   └── scrapeBlogs.js   # Standalone script to run the full scraping process
+│    
 ├── routes/              # Express routes (if applicable)
 ├── server.js            # Main application entry point
 └── package.json         # Project dependencies and scripts
@@ -76,7 +78,7 @@ nodejs_scrapper/
 ### Key Components
 
 - **`server.js`**: Initializes the database connection and runs the scraping pipeline sequence (`fetchMainPage` -> `fetchLastPages` -> `fetchBlogs` -> `parseBlogs`) on startup.
-- **`scraper/scrapeBlogs.js`**: A comprehensive script that connects to the DB, crawls the blog list, visits individual pages, parses the content (handling headings, paragraphs, lists, and images), and saves them to the database.
+- **`scripts/runScraper.js`**: A comprehensive script that connects to the DB, crawls the blog list, visits individual pages, parses the content (handling headings, paragraphs, lists, and images), and saves them to the database.
 - **`models/Article.js`**: Defines the data structure for storing articles, including title, source URL, images, and content blocks.
 
 ## 🔄 Workflow
