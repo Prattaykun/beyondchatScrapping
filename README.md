@@ -44,16 +44,26 @@ Check out the live demo of the project here: [BeyondChat Scrapping](https://beyo
           │  - Fetch articles                 │
           │  - Parse HTML (title, h1-h6, p)   │
           │  - Store in MongoDB               │
+          |  - CRUD API just for these        |
+          |    articles                       │
           └─────────────────┬─────────────────┘
                             │
                             ▼
-          ┌───────────────────────────────────┐
-          │        Phase 2: AI Processor      │
-          │  - Google Search (SERP)           │
-          │  - Gemini AI rewriting            │
-          │  - Content enhancement            │
-          │  - Store formatted articles       │
-          └─────────────────┬─────────────────┘
+          ┌─────────────────────────────────────┐
+          │        Phase 2: AI Processor        │
+          │  - Google Search (SERP)             │
+          |  - Extract top results              │
+          |  - Start Scraping For Restructuring │
+          |    the top SEO articles             │
+          |   -breaks when have 2 scraped       |
+          |     articles                        |
+          |   -original article structures      |
+          |    along with scraped articles      |
+          |    sent to gemini                   │
+          │  - Gemini AI rewriting              │
+          │  - Content enhancement              │
+          │  - Store formatted articles         │
+          └─────────────────┬───────────────────┘
                             │
                             ▼
           ┌───────────────────────────────────┐
