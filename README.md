@@ -26,7 +26,7 @@ Displays original and AI-enhanced articles through a modern React + Vite interfa
 
 ---
 
-## Live Demo
+## Live Demo (Please allow some time for the server to wake up if it's your first visit!)
 
 Check out the live demo of the project here: [BeyondChat Scrapping](https://beyondchat-scrapping.vercel.app/)
 ---
