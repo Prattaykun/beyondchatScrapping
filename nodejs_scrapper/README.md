@@ -97,3 +97,27 @@ nodejs_scrapper/
 
 - `npm start`: Runs `node server.js`. Starts the server and runs the bootstrap scraping sequence.
 - `npm run scrape`: Runs `node scraper/scrapeBlogs.js`. Executes the standalone scraping script.
+## 🔗 Live Demo & API Endpoints
+
+### Base URL
+https://beyondchat-scrapping-3vja.vercel.app
+
+### Fetch All Articles
+GET /api/articles  
+https://beyondchat-scrapping-3vja.vercel.app/api/articles
+
+### Fetch Single Article
+GET /api/articles/:id  
+Example:  
+https://beyondchat-scrapping-3vja.vercel.app/api/articles/6954165eaa9344c1e109f12c
+
+### Create Article
+POST /api/articles  
+https://beyondchat-scrapping-3vja.vercel.app/api/articles
+
+### Update Article
+PUT /api/articles/:id
+
+### Delete Article
+DELETE /api/articles/:id
+
