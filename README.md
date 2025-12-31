@@ -125,6 +125,7 @@ Extracts blog articles from BeyondChats and stores structured data into MongoDB.
 ```bash
 cd nodejs_scrapper
 npm install
+npm run scrape
 npm start
 ```
 
@@ -133,7 +134,7 @@ This will:
 * Crawl articles
 * Parse content
 * Save structured data in MongoDB
-
+* Start CRUD API server
 ---
 
 ## 🧠 Phase 2 — AI Enhancement Engine
