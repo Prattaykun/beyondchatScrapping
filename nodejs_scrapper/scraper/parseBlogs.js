@@ -16,7 +16,6 @@ async function parseBlogs() {
 
     const slug = file.replace(".html", "");
 
-    // ✅ CORRECT ROOT
     const contentRoot = $("#content");
     if (!contentRoot.length) {
       console.warn("⚠️ #content not found for:", title);
@@ -25,13 +24,11 @@ async function parseBlogs() {
 
     const sections = [];
 
-    // ✅ Traverse relevant tags IN ORDER
     contentRoot
       .find("h2, h3, h4, h5, h6, p, figure, ul, ol")
       .each((_, el) => {
         const tag = el.tagName.toLowerCase();
 
-        // 🔹 HEADINGS
         if (tag.startsWith("h")) {
           const text = $(el).text().trim();
           if (text) {
@@ -43,7 +40,6 @@ async function parseBlogs() {
           }
         }
 
-        // 🔹 PARAGRAPHS (keep inline tags)
         else if (tag === "p") {
           const htmlText = $(el).html()?.trim();
           if (htmlText) {
@@ -54,7 +50,6 @@ async function parseBlogs() {
           }
         }
 
-        // 🔹 IMAGES (only from figure)
         else if (tag === "figure") {
           const img = $(el).find("img").attr("src");
           if (img) {
@@ -65,15 +60,12 @@ async function parseBlogs() {
           }
         }
 
-        // 🔹 LISTS
         else if (tag === "ul" || tag === "ol") {
           const items = [];
-          $(el)
-            .find("li")
-            .each((_, li) => {
-              const t = $(li).text().trim();
-              if (t) items.push(t);
-            });
+          $(el).find("li").each((_, li) => {
+            const t = $(li).text().trim();
+            if (t) items.push(t);
+          });
 
           if (items.length) {
             sections.push({
@@ -86,18 +78,23 @@ async function parseBlogs() {
       });
 
     if (!sections.length) {
-      console.warn("⚠️ Sections still empty for:", title);
+      console.warn("⚠️ Sections empty for:", title);
       continue;
     }
 
-    await Article.create({
-      title,
-      slug,
-      sections,
-      sourceUrl: ""
-    });
+    // ✅ UPSERT (NO DUPLICATES)
+    await Article.findOneAndUpdate(
+      { slug },
+      {
+        title,
+        slug,
+        sections,
+        sourceUrl: ""
+      },
+      { upsert: true, new: true }
+    );
 
-    console.log(` Stored structured article: ${title}`);
+    console.log(`📦 Stored/Updated article: ${title}`);
   }
 }
 

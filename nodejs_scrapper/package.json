@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "scrape": "node scraper/scrapeBlogs.js",
+    "scrape": "node scripts/runScraper.js",
     "build": "echo \"No build step required for backend\""
   },
   "dependencies": {

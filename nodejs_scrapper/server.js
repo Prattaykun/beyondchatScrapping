@@ -1,27 +1,19 @@
-// server.js
-
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
-
-const fetchMainPage = require("./scraper/fetchMainPage");
-const fetchLastPages = require("./scraper/fetchLastPages");
-const fetchBlogs = require("./scraper/fetchBlogs");
-const parseBlogs = require("./scraper/parseBlogs");
+const articleRoutes = require("./routes/articleRoutes");
 
 const app = express();
 
-async function bootstrap() {
-  await connectDB();
-  await fetchMainPage();
-  await fetchLastPages();
-  await fetchBlogs();
-  await parseBlogs();
-  console.log("Full scraping pipeline completed");
-}
+app.use(express.json());
+app.use("/api/articles", articleRoutes);
 
-bootstrap();
+app.get("/", (req, res) => {
+  res.send("API running");
+});
 
-app.listen(process.env.PORT || 5000, () =>
-  console.log("Server running")
-);
+connectDB();
+
+app.listen(process.env.PORT || 5000, () => {
+  console.log("Server running");
+});

@@ -95,8 +95,8 @@ nodejs_scrapper/
 
 ## 📜 Scripts
 
-- `npm start`: Runs `node server.js`. Starts the server and runs the bootstrap scraping sequence.
-- `npm run scrape`: Runs `node scraper/scrapeBlogs.js`. Executes the standalone scraping script.
+  - `npm start`: Runs `node server.js`. Starts the server and runs the bootstrap scraping sequence.
+  - `npm run scrape`: Runs `node scripts/runScraper.js`. Executes the standalone scraping script.
 ## 🔗 Live Demo & API Endpoints
 
 ### Base URL
@@ -109,7 +109,7 @@ https://beyondchat-scrapping-3vja.vercel.app/api/articles
 ### Fetch Single Article
 GET /api/articles/:id  
 Example:  
-https://beyondchat-scrapping-3vja.vercel.app/api/articles/6954165eaa9344c1e109f12c
+https://beyondchat-scrapping-3vja.vercel.app/api/articles/6954a626c2aa9cfe6e53bafc
 
 ### Create Article
 POST /api/articles  
